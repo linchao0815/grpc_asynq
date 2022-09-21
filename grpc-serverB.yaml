@@ -1,0 +1,21 @@
+grpc:
+  - name: grpcServerB
+    enabled: true
+    port: 2022
+    enableReflection: true            # Optional, default: false
+    enableRkGwOption: true            # Optional, default: false    
+    sw:
+      enabled: true                                       # Optional, default: false
+      path: "sw"                                          # Optional, default: "sw"    
+      jsonPath: "api/gen/v1"                                        # Optional
+    middleware:
+      trace:
+        enabled: true
+        exporter:
+          jaeger:
+            agent:
+              enabled: false
+            collector:
+              enabled: true                               # Optional, default: false
+      logging:
+        enabled: true
