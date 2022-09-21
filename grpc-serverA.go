@@ -31,26 +31,28 @@ type Service struct {
 func main() {
 	boot := rkboot.NewBoot(rkboot.WithBootConfigRaw(grpcBootA))
 
-	// register grpc
+	// register grpc: Login & CallA
 	grpcEntry := rkgrpc.GetGrpcEntry("grpcServerA")
 	grpcEntry.AddRegFuncGrpc(registerServerA)
-	//grpcEntry.AddRegFuncGw(greeter.RegisterServerAHandlerFromEndpoint)
-	// register grpc
-	//grpcEntry := rkgrpc.GetGrpcEntry("greeter")
+
+	// register grpc gateway: /v1/enqueue
 	grpcEntry.AddRegFuncGrpc(registerMyServer)
 	grpcEntry.AddRegFuncGw(greeter.RegisterMyServerHandlerFromEndpoint)
 
 	// Bootstrap
 	boot.Bootstrap(context.TODO())
-	asynqServer := startAsynqWorker(grpcEntry.LoggerEntry.Logger, grpcBootA)
-	boot.AddShutdownHookFunc("asynq worker", asynqServer.Stop)
+
+	// start asynq server
+	asynqServer := startAsynqWorker(grpcEntry.LoggerEntry.Logger)
+	boot.AddShutdownHookFunc("asynq worker", asynqServer.Shutdown)
+
 	// Wait for shutdown sig
 	boot.WaitForShutdownSig(context.TODO())
 }
-func startAsynqWorker(logger *zap.Logger, grpcBootA []byte) *asynq.Server {
+func startAsynqWorker(logger *zap.Logger) *asynq.Server {
 	// start asynq service
 	srv := asynq.NewServer(
-		asynq.RedisClientOpt{Addr: "192.168.44.203:6379"},
+		asynq.RedisClientOpt{Addr: "localhost:6379"},
 		asynq.Config{
 			Logger: logger.Sugar(),
 		},
@@ -79,13 +81,14 @@ func registerMyServer(server *grpc.Server) {
 }
 
 func (server *Service) Enqueue(ctx context.Context, req *greeter.TaskReq) (*greeter.TaskResp, error) {
-	client := asynq.NewClient(asynq.RedisClientOpt{Addr: "192.168.44.203:6379"})
+	client := asynq.NewClient(asynq.RedisClientOpt{Addr: "localhost:6379"})
 	defer client.Close()
 
 	// get trace metadata
 	header := http.Header{}
 	rkgrpcctx.GetTracerPropagator(ctx).Inject(ctx, propagation.HeaderCarrier(header))
 
+	// enqueue task
 	err := server.enqueueTask(client, header)
 
 	return &greeter.TaskResp{}, err
@@ -101,24 +104,20 @@ func registerServerA(server *grpc.Server) {
 	greeter.RegisterServerAServer(server, &Service{})
 }
 
-func CallFuncAA(ctx context.Context) {
-	_, span := rkasynq.NewSpan(ctx, "funcAA")
-	defer rkasynq.EndSpan(span, true)
-
-	time.Sleep(10 * time.Millisecond)
-}
-
 func (server *Service) Login(ctx context.Context, req *greeter.LoginReq) (*greeter.LoginResp, error) {
 	md := metadata.Pairs()
 	rkgrpcctx.GetTracerPropagator(ctx).Inject(ctx, &rkgrpcctx.GrpcMetadataCarrier{Md: &md})
 	ctx = metadata.NewOutgoingContext(ctx, md)
-	//server.CallA(ctx, &greeter.CallAReq{})
-	// ctx, span := rkasynq.NewSpan(ctx, "Login")
-	// defer rkasynq.EndSpan(span, true)
 
-	//time.Sleep(10 * time.Millisecond)
-	CallFuncAA(ctx)
+	server.LoginAfter(ctx)
 	return &greeter.LoginResp{}, nil
+}
+
+func (server *Service) LoginAfter(ctx context.Context) {
+	span := rkgrpcctx.NewTraceSpan(ctx, "LoginAfter")
+	defer rkgrpcctx.EndTraceSpan(ctx, span, true)
+
+	time.Sleep(10 * time.Millisecond)
 }
 
 func (server *Service) CallA(ctx context.Context, req *greeter.CallAReq) (*greeter.CallAResp, error) {
@@ -131,14 +130,10 @@ func (server *Service) CallA(ctx context.Context, req *greeter.CallAReq) (*greet
 	connB, _ := grpc.Dial("localhost:2022", opts...)
 	defer connB.Close()
 	clientB := greeter.NewServerBClient(connB)
-	// eject span context from gin context and inject into grpc ctx
-	//grpcCtx := trace.ContextWithRemoteSpanContext(context.Background(), rkginctx.GetTraceSpan(ctx).SpanContext())
-	grpcCtx := ctx
-	md := metadata.Pairs()
-	rkgrpcctx.GetTracerPropagator(ctx).Inject(grpcCtx, &rkgrpcctx.GrpcMetadataCarrier{Md: &md})
-	grpcCtx = metadata.NewOutgoingContext(grpcCtx, md)
-	// call gRPC server B
-	clientB.CallB(grpcCtx, &greeter.CallBReq{})
-	server.Enqueue(ctx, &greeter.TaskReq{})
+
+	// 把 trace info 载入到 context 中
+	ctx = rkgrpcctx.InjectSpanToNewContext(ctx)
+	clientB.CallB(ctx, &greeter.CallBReq{})
+
 	return &greeter.CallAResp{}, nil
 }

@@ -1,13 +1,15 @@
+app:
+  name: grpcServerA          # 为了能让 jaeger 辨别不同的服务，这里必须取名，否则为：rk
 grpc:
   - name: grpcServerA
     enabled: true
     port: 2008
-    enableReflection: true            # Optional, default: false
-    enableRkGwOption: true            # Optional, default: false    
+    enableReflection: true
+    enableRkGwOption: true
     sw:
-      enabled: true                                       # Optional, default: false
-      path: "sw"                                          # Optional, default: "sw"    
-      jsonPath: "api/gen/v1"                                        # Optional
+      enabled: true
+      path: "sw"
+      jsonPath: "api/gen/v1"
     middleware:
       trace:
         enabled: true
@@ -16,15 +18,17 @@ grpc:
             agent:
               enabled: false
             collector:
-              enabled: true                               # Optional, default: false
+              enabled: true
       logging:
         enabled: true
 asynq:
   trace:
     enabled: true
+    serviceName: worker
+    serviceVersion: v1
     exporter:
       jaeger:
         agent:
-          enabled: false                              # Optional, default: false
+          enabled: false
         collector:
-          enabled: true                               # Optional, default: false
+          enabled: true
