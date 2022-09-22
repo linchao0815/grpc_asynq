@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/hibiken/asynq"
@@ -89,15 +90,15 @@ func (server *Service) Enqueue(ctx context.Context, req *greeter.TaskReq) (*gree
 	rkgrpcctx.GetTracerPropagator(ctx).Inject(ctx, propagation.HeaderCarrier(header))
 
 	// enqueue task
-	err := server.enqueueTask(client, header)
+	task, _ := task.NewDemoTask(header)
+	client.Enqueue(task)
 
-	return &greeter.TaskResp{}, err
-}
+	// 把 Trace 信息，存入 Metadata，以 Header 的形式返回给 httpclient
+	for k, v := range header {
+		rkgrpcctx.AddHeaderToClient(ctx, k, strings.Join(v, ","))
+	}
 
-func (server *Service) enqueueTask(client *asynq.Client, header http.Header) error {
-	task, err := task.NewDemoTask(header)
-	_, err = client.Enqueue(task)
-	return err
+	return &greeter.TaskResp{}, nil
 }
 
 func registerServerA(server *grpc.Server) {
