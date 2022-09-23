@@ -28,8 +28,3 @@ plugins:
     opt:
       - grpc_api_configuration=api/v1/gw_mapping.yaml
       - allow_repeated_fields_in_body=true
-  - name: go-asynq
-    out: api/gen
-    opt:
-      - grpc_api_configuration=api/v1/gw_mapping.yaml
-      - paths=source_relative

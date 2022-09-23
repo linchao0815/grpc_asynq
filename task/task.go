@@ -7,10 +7,11 @@ import (
 	"net/http"
 	"time"
 
+	rkgrpcctx "github.com/rookie-ninja/rk-grpc/v2/middleware/context"
+
 	"github.com/hibiken/asynq"
 	greeter "github.com/rookie-ninja/rk-demo/api/gen/v1"
 	rkentry "github.com/rookie-ninja/rk-entry/v2/entry"
-	rkgrpcctx "github.com/rookie-ninja/rk-grpc/v2/middleware/context"
 	rkasynq "github.com/rookie-ninja/rk-repo/asynq"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -47,18 +48,36 @@ func clientA_Login(ctx context.Context) {
 	connA, _ := grpc.Dial("localhost:2008", opts...)
 	defer connA.Close()
 	clientA := greeter.NewServerAClient(connA)
+
 	// eject span context from gin context and inject into grpc ctx
-	//grpcCtx := trace.ContextWithRemoteSpanContext(context.Background(), rkginctx.GetTraceSpan(ctx).SpanContext())
 	md := metadata.Pairs()
-	pg := rkgrpcctx.GetTracerPropagator(ctx)
-	if pg != nil {
-		pg.Inject(ctx, &rkgrpcctx.GrpcMetadataCarrier{Md: &md})
-	} else {
-		fmt.Printf("rkgrpcctx.GetTracerPropagator() =nil\n")
-	}
+	pg := rkasynq.GetPropagator(ctx)
+	pg.Inject(ctx, &rkgrpcctx.GrpcMetadataCarrier{Md: &md})
+
 	ctx = metadata.NewOutgoingContext(ctx, md)
-	// call gRPC server B
+
 	clientA.Login(ctx, &greeter.LoginReq{})
+}
+
+func clientA_CallA(ctx context.Context) {
+	// create grpc client
+	opts := []grpc.DialOption{
+		grpc.WithBlock(),
+		grpc.WithInsecure(),
+	}
+	// create connection with grpc-serverA
+	connA, _ := grpc.Dial("localhost:2008", opts...)
+	defer connA.Close()
+	clientA := greeter.NewServerAClient(connA)
+
+	// eject span context from gin context and inject into grpc ctx
+	md := metadata.Pairs()
+	pg := rkasynq.GetPropagator(ctx)
+	pg.Inject(ctx, &rkgrpcctx.GrpcMetadataCarrier{Md: &md})
+
+	ctx = metadata.NewOutgoingContext(ctx, md)
+
+	clientA.CallA(ctx, &greeter.CallAReq{})
 }
 
 func HandleDemoTask(ctx context.Context, t *asynq.Task) error {
@@ -72,31 +91,37 @@ func HandleDemoTask(ctx context.Context, t *asynq.Task) error {
 
 	rkentry.GlobalAppCtx.GetLoggerEntryDefault().Info("handle demo task", zap.String("traceId", rkasynq.GetTraceId(ctx)))
 
-	CallFuncA(ctx)
-	CallFuncB(ctx)
+	// call func A & B
+	CallWorkerA(ctx)
+	CallWorkerB(ctx)
+
+	// call clientA Login
 	clientA_Login(ctx)
 
+	// call clientA CallA
+	clientA_CallA(ctx)
+	return fmt.Errorf("HandleDemoTask err")
 	return nil
 }
 
-func CallFuncA(ctx context.Context) {
-	newCtx, span := rkasynq.NewSpan(ctx, "funcA")
+func CallWorkerA(ctx context.Context) {
+	newCtx, span := rkasynq.NewSpan(ctx, "workerA")
 	defer rkasynq.EndSpan(span, true)
 
 	time.Sleep(10 * time.Millisecond)
 
-	CallFuncAA(newCtx)
+	CallWorkerAA(newCtx)
 }
 
-func CallFuncAA(ctx context.Context) {
-	_, span := rkasynq.NewSpan(ctx, "funcAA")
+func CallWorkerAA(ctx context.Context) {
+	_, span := rkasynq.NewSpan(ctx, "workerA-A")
 	defer rkasynq.EndSpan(span, true)
 
 	time.Sleep(10 * time.Millisecond)
 }
 
-func CallFuncB(ctx context.Context) {
-	_, span := rkasynq.NewSpan(ctx, "funcB")
+func CallWorkerB(ctx context.Context) {
+	_, span := rkasynq.NewSpan(ctx, "workerB")
 	defer rkasynq.EndSpan(span, true)
 
 	time.Sleep(10 * time.Millisecond)

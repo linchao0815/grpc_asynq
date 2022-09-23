@@ -55,7 +55,7 @@ func local_request_MyServer_Enqueue_0(ctx context.Context, marshaler runtime.Mar
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterMyServerHandlerFromEndpoint instead.
 func RegisterMyServerHandlerServer(ctx context.Context, mux *runtime.ServeMux, server MyServerServer) error {
 
-	mux.Handle("GET", pattern_MyServer_Enqueue_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_MyServer_Enqueue_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -119,7 +119,7 @@ func RegisterMyServerHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 // "MyServerClient" to call the correct interceptors.
 func RegisterMyServerHandlerClient(ctx context.Context, mux *runtime.ServeMux, client MyServerClient) error {
 
-	mux.Handle("GET", pattern_MyServer_Enqueue_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_MyServer_Enqueue_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)

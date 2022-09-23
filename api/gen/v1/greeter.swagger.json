@@ -17,7 +17,7 @@
   ],
   "paths": {
     "/v1/enqueue": {
-      "get": {
+      "post": {
         "operationId": "MyServer_Enqueue",
         "responses": {
           "200": {

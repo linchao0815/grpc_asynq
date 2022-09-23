@@ -7,4 +7,4 @@ http:
     - selector: api.v1.ServerA.Login
       get: /v1/login
     - selector: api.v1.MyServer.Enqueue
-      get: /v1/enqueue      
+      post: /v1/enqueue
