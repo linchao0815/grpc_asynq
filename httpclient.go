@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"net/http"
+	"time"
+
 	"go.opentelemetry.io/contrib"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
@@ -12,8 +15,6 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	oteltrace "go.opentelemetry.io/otel/trace"
-	"net/http"
-	"time"
 )
 
 var (
@@ -45,10 +46,11 @@ func main() {
 		span.SpanContext().SpanID().String()))
 
 	// enqueue 第一个 task
-	ctx = send("http://localhost:2008/v1/enqueue", `{""}`, ctx, "first-send")
+	//ctx = send("http://localhost:2008/v1/Enqueue", `{"Param":"first-send"}`, ctx, "first-send")
+	ctx = send("http://localhost:2008/v1/GameTest", `{"Param":"first-send"}`, ctx, "first-send")
 
 	// enqueue 第二个 task
-	send("http://localhost:2008/v1/enqueue", `{""}`, ctx, "second-send")
+	send("http://localhost:2002/v1/CallB", `{"Param":"second-send"}`, ctx, "second-send")
 
 	// 不要在最上面用 defer span.End()，否则 jaeger 里看不到 root-send，因为 span.End() 之后来不及推送到 jaeger
 	span.End()

@@ -2,21 +2,27 @@ module github.com/rookie-ninja/rk-demo
 
 go 1.17
 
+replace myasynq => ./myasynq
+
 require (
+	github.com/envoyproxy/protoc-gen-validate v0.1.0
+	github.com/golang/protobuf v1.5.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.3
 	github.com/hibiken/asynq v0.23.0
+	github.com/linchao0815/protoc-gen-go-asynqgen v1.0.10
 	github.com/rookie-ninja/rk-boot/v2 v2.2.6
 	github.com/rookie-ninja/rk-entry/v2 v2.2.6
 	github.com/rookie-ninja/rk-grpc/v2 v2.2.8
-	github.com/rookie-ninja/rk-repo/asynq v0.0.4
 	go.opentelemetry.io/contrib v1.8.0
-	go.opentelemetry.io/otel v1.8.0
+	go.opentelemetry.io/otel v1.10.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.8.0
 	go.opentelemetry.io/otel/sdk v1.8.0
-	go.opentelemetry.io/otel/trace v1.8.0
+	go.opentelemetry.io/otel/trace v1.10.0
 	go.uber.org/zap v1.21.0
+	google.golang.org/genproto v0.0.0-20220519153652-3a47de7e79bd
 	google.golang.org/grpc v1.46.2
 	google.golang.org/protobuf v1.28.0
+	myasynq v0.0.0-00010101000000-000000000000
 )
 
 require (
@@ -29,7 +35,6 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-redis/redis/v8 v8.11.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
@@ -60,7 +65,6 @@ require (
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
-	google.golang.org/genproto v0.0.0-20220519153652-3a47de7e79bd // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

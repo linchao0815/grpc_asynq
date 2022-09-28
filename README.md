@@ -6,6 +6,9 @@ In this example, we will start two gRPC servers serverA and serverB and implemen
 go get github.com/rookie-ninja/rk-boot/v2
 go get github.com/rookie-ninja/rk-grpc/v2
 go get github.com/rookie-ninja/rk-gin/v2
+
+# install protoc-gen-go-asynqgen
+go install github.com/linchao0815/protoc-gen-go-asynqgen@v1.0.11
 ```
 
 ## Quick start

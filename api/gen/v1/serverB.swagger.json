@@ -1,13 +1,10 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "v1/server.proto",
+    "title": "serverB.proto",
     "version": "version not set"
   },
   "tags": [
-    {
-      "name": "ServerA"
-    },
     {
       "name": "ServerB"
     }
@@ -19,14 +16,14 @@
     "application/json"
   ],
   "paths": {
-    "/v1/login": {
-      "get": {
-        "operationId": "ServerA_Login",
+    "/v1/CallB": {
+      "post": {
+        "operationId": "ServerB_CallB",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1LoginResp"
+              "$ref": "#/definitions/genCallBResp"
             }
           },
           "default": {
@@ -36,24 +33,47 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/genCallBReq"
+            }
+          }
+        ],
         "tags": [
-          "ServerA"
+          "ServerB"
         ]
       }
     }
   },
   "definitions": {
+    "genCallBReq": {
+      "type": "object",
+      "properties": {
+        "Param": {
+          "type": "string"
+        }
+      }
+    },
+    "genCallBResp": {
+      "type": "object",
+      "properties": {
+        "Param": {
+          "type": "string"
+        }
+      }
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
-        "typeUrl": {
+        "@type": {
           "type": "string"
-        },
-        "value": {
-          "type": "string",
-          "format": "byte"
         }
-      }
+      },
+      "additionalProperties": {}
     },
     "rpcStatus": {
       "type": "object",
@@ -72,15 +92,6 @@
           }
         }
       }
-    },
-    "v1CallAResp": {
-      "type": "object"
-    },
-    "v1CallBResp": {
-      "type": "object"
-    },
-    "v1LoginResp": {
-      "type": "object"
     }
   }
 }

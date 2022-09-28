@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"myasynq"
 	"net/http"
 	"time"
 
@@ -12,7 +13,6 @@ import (
 	"github.com/hibiken/asynq"
 	greeter "github.com/rookie-ninja/rk-demo/api/gen/v1"
 	rkentry "github.com/rookie-ninja/rk-entry/v2/entry"
-	rkasynq "github.com/rookie-ninja/rk-repo/asynq"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -24,12 +24,12 @@ const (
 	TypeDemo = "demo-task"
 )
 
-type DemoPayload struct {
-	TraceHeader http.Header `json:"traceHeader"`
-}
+// type DemoPayload struct {
+// 	TraceHeader http.Header `json:"traceHeader"`
+// }
 
 func NewDemoTask(header http.Header) (*asynq.Task, error) {
-	payload, err := json.Marshal(DemoPayload{
+	payload, err := json.Marshal(myasynq.TaskPaylod{
 		TraceHeader: header,
 	})
 	if err != nil {
@@ -38,7 +38,7 @@ func NewDemoTask(header http.Header) (*asynq.Task, error) {
 	return asynq.NewTask(TypeDemo, payload), nil
 }
 
-func clientA_Login(ctx context.Context) {
+func ClientA_Login(ctx context.Context) {
 	// create grpc client
 	opts := []grpc.DialOption{
 		grpc.WithBlock(),
@@ -51,7 +51,7 @@ func clientA_Login(ctx context.Context) {
 
 	// eject span context from gin context and inject into grpc ctx
 	md := metadata.Pairs()
-	pg := rkasynq.GetPropagator(ctx)
+	pg := myasynq.GetPropagator(ctx)
 	pg.Inject(ctx, &rkgrpcctx.GrpcMetadataCarrier{Md: &md})
 
 	ctx = metadata.NewOutgoingContext(ctx, md)
@@ -59,7 +59,7 @@ func clientA_Login(ctx context.Context) {
 	clientA.Login(ctx, &greeter.LoginReq{})
 }
 
-func clientA_CallA(ctx context.Context) {
+func ClientA_CallA(ctx context.Context) {
 	// create grpc client
 	opts := []grpc.DialOption{
 		grpc.WithBlock(),
@@ -72,7 +72,7 @@ func clientA_CallA(ctx context.Context) {
 
 	// eject span context from gin context and inject into grpc ctx
 	md := metadata.Pairs()
-	pg := rkasynq.GetPropagator(ctx)
+	pg := myasynq.GetPropagator(ctx)
 	pg.Inject(ctx, &rkgrpcctx.GrpcMetadataCarrier{Md: &md})
 
 	ctx = metadata.NewOutgoingContext(ctx, md)
@@ -84,29 +84,29 @@ func HandleDemoTask(ctx context.Context, t *asynq.Task) error {
 	// sleep a while for testing
 	time.Sleep(50 * time.Millisecond)
 
-	var p DemoPayload
+	var p myasynq.TaskPaylod
 	if err := json.Unmarshal(t.Payload(), &p); err != nil {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
 	}
 
-	rkentry.GlobalAppCtx.GetLoggerEntryDefault().Info("handle demo task", zap.String("traceId", rkasynq.GetTraceId(ctx)))
+	rkentry.GlobalAppCtx.GetLoggerEntryDefault().Info("handle demo task", zap.String("traceId", myasynq.GetTraceId(ctx)))
 
 	// call func A & B
 	CallWorkerA(ctx)
 	CallWorkerB(ctx)
 
 	// call clientA Login
-	clientA_Login(ctx)
+	ClientA_Login(ctx)
 
 	// call clientA CallA
-	clientA_CallA(ctx)
-	return fmt.Errorf("HandleDemoTask err")
+	ClientA_CallA(ctx)
+	//return fmt.Errorf("HandleDemoTask err")
 	return nil
 }
 
 func CallWorkerA(ctx context.Context) {
-	newCtx, span := rkasynq.NewSpan(ctx, "workerA")
-	defer rkasynq.EndSpan(span, true)
+	newCtx, span := myasynq.NewSpan(ctx, "workerA")
+	defer myasynq.EndSpan(span, true)
 
 	time.Sleep(10 * time.Millisecond)
 
@@ -114,15 +114,15 @@ func CallWorkerA(ctx context.Context) {
 }
 
 func CallWorkerAA(ctx context.Context) {
-	_, span := rkasynq.NewSpan(ctx, "workerA-A")
-	defer rkasynq.EndSpan(span, true)
+	_, span := myasynq.NewSpan(ctx, "workerA-A")
+	defer myasynq.EndSpan(span, true)
 
 	time.Sleep(10 * time.Millisecond)
 }
 
 func CallWorkerB(ctx context.Context) {
-	_, span := rkasynq.NewSpan(ctx, "workerB")
-	defer rkasynq.EndSpan(span, true)
+	_, span := myasynq.NewSpan(ctx, "workerB")
+	defer myasynq.EndSpan(span, true)
 
 	time.Sleep(10 * time.Millisecond)
 }

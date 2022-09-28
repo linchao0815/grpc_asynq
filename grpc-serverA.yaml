@@ -1,5 +1,5 @@
 app:
-  name: grpcServerA          # 为了能让 jaeger 辨别不同的服务，这里必须取名，否则为：rk
+  name: rk #grpcServerA          # 为了能让 jaeger 辨别不同的服务，这里必须取名，否则为：rk
 grpc:
   - name: grpcServerA
     enabled: true
