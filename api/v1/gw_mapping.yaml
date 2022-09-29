@@ -1,10 +1,8 @@
 type: google.api.Service
 config_version: 3
-
-# Please refer google.api.Http in third-party/googleapis/google/api/http.proto file for details.
 http:
   rules:
-    - selector: api.v1.ServerA.Login
-      get: /v1/login
-    - selector: api.v1.MyServer.Enqueue
-      post: /v1/enqueue
+    - selector: api.v1.User.CreateUser
+      get: /v1/user/create
+    - selector: api.v1.User.UpdateUser
+      get: /v1/user/update

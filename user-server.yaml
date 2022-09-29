@@ -1,7 +1,7 @@
 app:
-  name: grpcServerA          # 为了能让 jaeger 辨别不同的服务，这里必须取名，否则为：rk
+  name: userServer
 grpc:
-  - name: grpcServerA
+  - name: userServer
     enabled: true
     port: 2008
     enableReflection: true
@@ -21,14 +21,3 @@ grpc:
               enabled: true
       logging:
         enabled: true
-asynq:
-  trace:
-    enabled: true
-    serviceName: worker
-    serviceVersion: v1
-    exporter:
-      jaeger:
-        agent:
-          enabled: false
-        collector:
-          enabled: true

@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package api.v1;
+
+import "asynq/asynq.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "api/v1/demo";
+
+service User {
+  rpc CreateUser(CreateUserPayload) returns (Response) {
+    option (asynq.task) = {
+      typename: "user:create"
+    };
+  };
+  rpc UpdateUser(UpdateUserPayload) returns (Response) {
+    option (asynq.task) = {
+      typename: "user:update"
+    };
+  };
+}
+
+message CreateUserPayload {
+  string name = 1;
+}
+
+message UpdateUserPayload {
+  string name = 1;
+}
+
+message Response {
+  string trace_id = 1;
+}
