@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package api.gen;
+
+option go_package = "api/gen/v1";
+import "google/api/annotations.proto";
+// import copy asynq.proto
+import "github.com/linchao0815/protoc-gen-go-asynqgen@v1.0.10/proto/asynq.proto";
+import "github.com/envoyproxy/protoc-gen-validate@v0.6.7/validate/validate.proto";
+import "common.proto";
+
+service ServerB_Task {
+  rpc CallB_Task (CallB_TaskReq) returns (Empty) {
+    option (google.api.http) = {
+      post: "/v1/CallB_Task"
+      body: "*"
+    };    
+    option (asynq.task) = {
+      typename: "ServerA_Task:CallB_Task" // define asynq.task typename, it is unique.
+    };      
+  }
+}
+
+message CallB_TaskReq {
+  string Param=1;  
+}

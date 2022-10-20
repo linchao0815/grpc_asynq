@@ -1,0 +1,284 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "serverA.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ServerA"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/CallA": {
+      "post": {
+        "operationId": "ServerA_CallA",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/genCallAResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/genCallAReq"
+            }
+          }
+        ],
+        "tags": [
+          "ServerA"
+        ]
+      }
+    },
+    "/v1/Enqueue": {
+      "post": {
+        "operationId": "ServerA_Enqueue",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/genTaskResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/genTaskReq"
+            }
+          }
+        ],
+        "tags": [
+          "ServerA"
+        ]
+      }
+    },
+    "/v1/GameTest": {
+      "post": {
+        "operationId": "ServerA_GameTest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/genGameTestResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/genGameTestReq"
+            }
+          }
+        ],
+        "tags": [
+          "ServerA"
+        ]
+      }
+    },
+    "/v1/GameTest_CallBack": {
+      "post": {
+        "operationId": "ServerA_GameTest_CallBack",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/genEmpty"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/genGameTestReply"
+            }
+          }
+        ],
+        "tags": [
+          "ServerA"
+        ]
+      }
+    },
+    "/v1/login": {
+      "post": {
+        "operationId": "ServerA_Login",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/genLoginResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/genLoginReq"
+            }
+          }
+        ],
+        "tags": [
+          "ServerA"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "genCallAReq": {
+      "type": "object",
+      "properties": {
+        "Param": {
+          "type": "string"
+        }
+      }
+    },
+    "genCallAResp": {
+      "type": "object",
+      "properties": {
+        "Param": {
+          "type": "string"
+        }
+      }
+    },
+    "genEmpty": {
+      "type": "object"
+    },
+    "genGameTestReply": {
+      "type": "object",
+      "properties": {
+        "Param": {
+          "type": "string"
+        }
+      }
+    },
+    "genGameTestReq": {
+      "type": "object",
+      "properties": {
+        "Param": {
+          "type": "string"
+        }
+      }
+    },
+    "genGameTestResp": {
+      "type": "object",
+      "properties": {
+        "Param": {
+          "type": "string"
+        }
+      }
+    },
+    "genLoginReq": {
+      "type": "object",
+      "properties": {
+        "Param": {
+          "type": "string"
+        }
+      }
+    },
+    "genLoginResp": {
+      "type": "object",
+      "properties": {
+        "Param": {
+          "type": "string"
+        }
+      }
+    },
+    "genTaskReq": {
+      "type": "object",
+      "properties": {
+        "Param": {
+          "type": "string"
+        }
+      }
+    },
+    "genTaskResp": {
+      "type": "object",
+      "properties": {
+        "Param": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

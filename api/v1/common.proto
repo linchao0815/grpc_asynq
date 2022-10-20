@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package api.gen;
+
+option go_package = "api/gen/v1";
+import "google/api/annotations.proto";
+import "github.com/envoyproxy/protoc-gen-validate@v0.6.7/validate/validate.proto";
+
+message Empty{}

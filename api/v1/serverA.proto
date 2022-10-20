@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package api.gen;
+
+option go_package = "api/gen/v1";
+import "google/api/annotations.proto";
+import "github.com/envoyproxy/protoc-gen-validate@v0.6.7/validate/validate.proto";
+import "common.proto";
+
+service ServerA {
+  rpc Login (LoginReq) returns (LoginResp) {
+    option (google.api.http) = {
+      post: "/v1/login"
+      body: "*"
+    };
+  }
+  rpc CallA (CallAReq) returns (CallAResp) {
+    option (google.api.http) = {
+      post: "/v1/CallA"
+      body: "*"
+    };  
+  }
+  rpc Enqueue (TaskReq) returns (TaskResp) {
+    option (google.api.http) = {
+      post: "/v1/Enqueue"
+      body: "*"
+    };  
+  }  
+  rpc GameTest (GameTestReq) returns (GameTestResp) {
+    option (google.api.http) = {
+      post: "/v1/GameTest"
+      body: "*"
+    };  
+  }    
+  rpc GameTest_CallBack (GameTestReply) returns (Empty) {
+    option (google.api.http) = {
+      post: "/v1/GameTest_CallBack"
+      body: "*"
+    };  
+  }   
+}
+
+message GameTestReply{
+  string Param=1;
+}
+
+message GameTestResp{
+  string Param=1;
+}
+
+message TaskReq {
+  string Param=1; 
+}
+
+message TaskResp {
+  string Param=1;   
+}
+
+message GameTestReq{
+  string Param=1;
+}
+
+message LoginReq {
+  string Param=1;   
+}
+
+message LoginResp {
+  string Param=1;   
+}
+
+message CallAReq {
+  string Param=1; 
+}
+
+message CallAResp {
+  string Param=1; 
+}

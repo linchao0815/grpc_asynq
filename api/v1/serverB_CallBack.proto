@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package api.gen;
+
+option go_package = "api/gen/v1";
+import "google/api/annotations.proto";
+// import copy asynq.proto
+import "github.com/linchao0815/protoc-gen-go-asynqgen@v1.0.10/proto/asynq.proto";
+import "github.com/envoyproxy/protoc-gen-validate@v0.6.7/validate/validate.proto";
+import "common.proto";
+
+service ServerB_CallBack {
+  rpc CallB_CallBack (CallBReply) returns (Empty) {
+    option (google.api.http) = {
+      post: "/ServerB_CallBack/CallB_CallBack"
+      body: "*"
+    };    
+    option (asynq.task) = {
+      typename: "ServerB_CallBack:CallB_CallBack" // define asynq.task typename, it is unique.
+    };     
+  }  
+}
+
+message CallBReply{
+  string Param=1;
+}
