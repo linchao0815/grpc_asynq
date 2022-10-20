@@ -8,7 +8,7 @@ import (
 	math "math"
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
-	_ "github.com/linchao0815/protoc-gen-go-asynqgen/proto"
+	_ "github.com/linchao0815/protoc-gen-go-asynq/proto"
 	_ "google.golang.org/protobuf/types/known/emptypb"
 	go_uber_org_zap_zapcore "go.uber.org/zap/zapcore"
 )
