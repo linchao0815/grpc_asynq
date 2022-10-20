@@ -1,5 +1,5 @@
 app:
-  name: userServer
+  name: rk
 grpc:
   - name: userServer
     enabled: true
@@ -13,11 +13,13 @@ grpc:
     middleware:
       trace:
         enabled: true
+        ignore: ["/api.v1.User/v1/CreateUser","/api.v1.User/HealthCheck"]   
         exporter:
           jaeger:
             agent:
               enabled: false
             collector:
               enabled: true
+              endpoint: "http://jaeger-query-nfttest.towergame.com:8087/api/traces"
       logging:
         enabled: true

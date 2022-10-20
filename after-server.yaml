@@ -1,5 +1,5 @@
 app:
-  name: afterServer  # 为了能让 jaeger 辨别不同的服务，这里必须取名，否则为：rk
+  name: rk  # 为了能让 jaeger 辨别不同的服务，这里必须取名，否则为：rk
 grpc:
   - name: afterServer
     enabled: true
@@ -19,5 +19,6 @@ grpc:
               enabled: false
             collector:
               enabled: true
+              endpoint: "http://jaeger-query-nfttest.towergame.com:8087/api/traces"
       logging:
         enabled: true

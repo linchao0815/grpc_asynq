@@ -4,9 +4,10 @@ import (
 	"context"
 	_ "embed"
 
-	"github.com/rookie-ninja/rk-boot/v2"
-	"github.com/rookie-ninja/rk-demo/api/gen/v1"
-	"github.com/rookie-ninja/rk-grpc/v2/boot"
+	rkboot "github.com/rookie-ninja/rk-boot/v2"
+	demo "github.com/rookie-ninja/rk-demo/api/gen/v1"
+	"github.com/rookie-ninja/rk-demo/grpcInterceptor"
+	rkgrpc "github.com/rookie-ninja/rk-grpc/v2/boot"
 	"google.golang.org/grpc"
 )
 
@@ -21,7 +22,7 @@ func main() {
 	grpcEntry.AddRegFuncGrpc(func(server *grpc.Server) {
 		demo.RegisterAfterServer(server, &afterServer{})
 	})
-
+	grpcEntry.UnaryInterceptors = append(grpcEntry.UnaryInterceptors, grpcInterceptor.UnaryInterceptor)
 	// Bootstrap
 	boot.Bootstrap(context.TODO())
 
@@ -29,7 +30,9 @@ func main() {
 	boot.WaitForShutdownSig(context.TODO())
 }
 
-type afterServer struct{}
+type afterServer struct {
+	demo.UnimplementedAfterServer
+}
 
 func (a afterServer) CreateAfter(ctx context.Context, req *demo.CreateAfterReq) (*demo.CreateAfterResp, error) {
 	return &demo.CreateAfterResp{}, nil

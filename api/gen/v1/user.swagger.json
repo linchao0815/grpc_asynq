@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "v1/user.proto",
+    "title": "user.proto",
     "version": "version not set"
   },
   "tags": [
@@ -16,8 +16,30 @@
     "application/json"
   ],
   "paths": {
-    "/v1/user/create": {
+    "/HealthCheck": {
       "get": {
+        "operationId": "User_HealthCheck",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiv1Empty"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/v1/CreateUser": {
+      "post": {
         "operationId": "User_CreateUser",
         "responses": {
           "200": {
@@ -35,10 +57,12 @@
         },
         "parameters": [
           {
-            "name": "name",
-            "in": "query",
-            "required": false,
-            "type": "string"
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateUserPayload"
+            }
           }
         ],
         "tags": [
@@ -46,8 +70,8 @@
         ]
       }
     },
-    "/v1/user/update": {
-      "get": {
+    "/v1/UpdateUser": {
+      "post": {
         "operationId": "User_UpdateUser",
         "responses": {
           "200": {
@@ -65,10 +89,12 @@
         },
         "parameters": [
           {
-            "name": "name",
-            "in": "query",
-            "required": false,
-            "type": "string"
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpdateUserPayload"
+            }
           }
         ],
         "tags": [
@@ -78,6 +104,9 @@
     }
   },
   "definitions": {
+    "apiv1Empty": {
+      "type": "object"
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -105,10 +134,26 @@
         }
       }
     },
+    "v1CreateUserPayload": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
     "v1Response": {
       "type": "object",
       "properties": {
         "traceId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpdateUserPayload": {
+      "type": "object",
+      "properties": {
+        "name": {
           "type": "string"
         }
       }

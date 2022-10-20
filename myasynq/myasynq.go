@@ -396,7 +396,7 @@ func Handle_task_before(ctx context.Context, task *asynq.Task, in interface{}) (
 	ctx = context.WithValue(ctx, tracerKey, tHolder.tracer)
 	ctx = context.WithValue(ctx, propagatorKey, tHolder.propagator)
 	ctx = context.WithValue(ctx, providerKey, tHolder.provider)
-
+	span.SetAttributes(attribute.String("req", ToMarshal(in)))
 	md := metadata.Pairs()
 	tHolder.propagator.Inject(ctx, &grpcMetadataCarrier{Md: &md})
 	ctx = metadata.NewOutgoingContext(ctx, md)
@@ -415,4 +415,14 @@ func Handle_task_after(span oteltrace.Span, err error) {
 type WrapPayload struct {
 	Trace   map[string]string `json:"trace"`
 	Payload interface{}       `json:",inline"`
+}
+
+func ToMarshal(obj interface{}) (str string) {
+	res, err := json.Marshal(obj)
+	if err != nil {
+		str = fmt.Sprint(obj)
+	} else {
+		str = string(res)
+	}
+	return str
 }
